@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+/* Apple-style design tokens */
+@theme {
+  --color-apple-gray-50: #f5f5f7;
+  --color-apple-gray-100: #e8e8ed;
+  --color-apple-gray-200: #d2d2d7;
+  --color-apple-gray-500: #86868b;
+  --color-apple-gray-900: #1d1d1f;
+  --color-apple-blue: #0071e3;
+  --color-hermes-orange: #f37021;
+
+  --radius-apple: 6px;
+  --radius-apple-lg: 8px;
+
+  --shadow-apple: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-apple-lg: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  --font-apple: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+}
+
+/* Base styles */
+body {
+  font-family: var(--font-apple);
+  background-color: var(--color-apple-gray-50);
+  color: var(--color-apple-gray-900);
+  margin: 0;
+  min-height: 100vh;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-apple-gray-200);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-apple-gray-500);
+}
+
+/* Hide scrollbar on list container */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Line clamp utility */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Focus styles - remove default blue outline */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: none;
+}
+
+/* Selection styles */
+::selection {
+  background-color: color-mix(in srgb, var(--color-apple-blue) 20%, transparent);
+}
