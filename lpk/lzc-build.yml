@@ -1,0 +1,25 @@
+# lzc-build.yml
+manifest: ./lzc-manifest.yml
+icon: ./lzc-icon.png
+# 打包编译后的 dist 目录
+contentdir: ../dist
+pkgout: ./
+
+# 构建脚本：使用 vite build
+buildscript: |
+  pushd ..
+  npm install
+  npm run build
+  popd
+
+devshell:
+  # 在 devshell 容器内运行 npm run dev，映射到容器本地 5173 端口
+  routes:
+    - /=http://${LocalIP}:5173
+  dependencies:
+    - nodejs
+    - npm
+  setupscript: |
+    echo "Welcome to Lazycat Devshell!"
+    # 可以在这里设置 npm 镜像
+    npm config set registry https://registry.npmmirror.com
