@@ -118,18 +118,18 @@ onUnmounted(() => {
 
 <template>
   <Teleport to="body">
-    <Transition name="modal">
+    <div
+      v-if="visible && item"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
+      <!-- Backdrop -->
       <div
-        v-if="visible && item"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-      >
-        <!-- Backdrop -->
-        <div
-          class="absolute inset-0 bg-black/30 backdrop-blur-sm"
-          @click="handleClose"
-        />
+        class="absolute inset-0 bg-black/30 backdrop-blur-sm modal-backdrop"
+        @click="handleClose"
+      />
 
-        <!-- Modal -->
+      <!-- Modal -->
+      <Transition name="modal">
         <div class="relative bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] w-full max-w-lg max-h-[80vh] overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-[var(--color-apple-gray-100)]">
@@ -217,29 +217,19 @@ onUnmounted(() => {
             </button>
           </div>
         </div>
-      </div>
-    </Transition>
+      </Transition>
+    </div>
   </Teleport>
 </template>
 
 <style scoped>
 .modal-enter-active,
 .modal-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
-}
-
-.modal-enter-active .relative,
-.modal-leave-active .relative {
-  transition: transform 0.2s ease;
-}
-
-.modal-enter-from .relative,
-.modal-leave-to .relative {
-  transform: scale(0.95);
 }
 </style>

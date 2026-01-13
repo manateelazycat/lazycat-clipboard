@@ -59,10 +59,10 @@ function closeMeta() {
 </script>
 
 <template>
-  <div class="fixed bottom-4 right-4 z-40 text-sm">
-    <div class="relative">
+  <div class="fixed bottom-4 left-4 right-4 md:right-auto md:w-auto z-40 text-sm">
+    <div class="relative inline-block max-w-full">
       <button
-        class="px-4 py-2 bg-[var(--color-apple-gray-900)] text-white rounded-full shadow-lg hover:bg-[var(--color-apple-gray-800)] transition-colors"
+        class="px-4 py-2 bg-[var(--color-apple-gray-900)] text-white rounded-full shadow-lg hover:shadow-[var(--shadow-apple-lg)] transition-all"
         @click="panelOpen = !panelOpen"
       >
         调试工具
@@ -70,7 +70,7 @@ function closeMeta() {
 
       <div
         v-if="panelOpen"
-        class="absolute bottom-12 right-0 w-56 bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] border border-[var(--color-apple-gray-100)] p-3 space-y-2"
+        class="absolute bottom-12 right-0 md:w-64 w-[min(92vw,360px)] max-w-full bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] border border-[var(--color-apple-gray-100)] p-3 space-y-2"
       >
         <button
           class="w-full px-3 py-2 rounded-[var(--radius-apple)] bg-[var(--color-apple-gray-900)] text-white hover:opacity-90 transition-opacity disabled:opacity-50"

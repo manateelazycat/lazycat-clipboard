@@ -6,6 +6,7 @@ export interface BaseClipboardItem {
   createdAt: number
   updatedAt: number
   order: number
+  pinned?: boolean
 }
 
 export interface TextClipboardItem extends BaseClipboardItem {
@@ -29,6 +30,13 @@ export interface ClipboardMetadata {
   latestCreatedAt?: number
   latestUpdatedAt?: number
   estimatedBytes: number
+}
+
+export type CopyMode = 'single-tap' | 'double-tap'
+
+export interface AppSettings {
+  enablePin: boolean
+  copyMode: CopyMode
 }
 
 export function isTextItem(item: ClipboardItem): item is TextClipboardItem {

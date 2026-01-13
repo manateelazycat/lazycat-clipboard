@@ -1,7 +1,7 @@
 English | [简体中文](./README.zh-CN.md)
 
 <div align="center">
-  <img src="public/lazycat-clipboard.svg" alt="Lazycat Clipboard Icon" width="120" height="120">
+  <img src="public/lazycat-clipboard.jpeg" alt="Lazycat Clipboard Icon" width="120" height="120">
 
   # Lazycat Clipboard
 

@@ -1,7 +1,7 @@
 [English](./README.md) | 简体中文
 
 <div align="center">
-  <img src="public/lazycat-clipboard.svg" alt="懒猫剪贴板图标" width="120" height="120">
+  <img src="public/lazycat-clipboard.jpeg" alt="懒猫剪贴板图标" width="120" height="120">
 
   # 懒猫剪贴板
 

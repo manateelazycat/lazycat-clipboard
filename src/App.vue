@@ -10,7 +10,7 @@ import { useClipboard } from '@/composables/useClipboard'
 import type { ClipboardItem } from '@/types/clipboard'
 import { isTextItem } from '@/types/clipboard'
 
-const { updateText, deleteItem, loadItems, isLoading } = useClipboardItems()
+const { updateText, deleteItem, loadItems, isLoading, syncLock } = useClipboardItems()
 const { lastCopyMessage, copyEventId } = useClipboard()
 const showDebugTools = import.meta.env.VITE_SHOW_DEBUG_TOOLS === 'true' || import.meta.env.DEV
 
@@ -36,6 +36,7 @@ let refreshTimer: number | null = null
 async function refreshIfIdle() {
   if (isModalOpen.value) return
   if (isLoading.value) return
+  if (syncLock.value) return
   await loadItems({ silent: true })
 }
 

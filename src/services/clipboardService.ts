@@ -24,7 +24,8 @@ export async function addTextItem(content: string): Promise<TextClipboardItem> {
     content,
     createdAt: Date.now(),
     updatedAt: Date.now(),
-    order: minOrder - 1
+    order: minOrder - 1,
+    pinned: false
   }
 
   await clipboardCollection.upsert(itemToSave)
@@ -48,7 +49,8 @@ export async function addImageItem(blob: Blob, mimeType: string): Promise<ImageC
     mimeType,
     createdAt: Date.now(),
     updatedAt: Date.now(),
-    order: minOrder - 1
+    order: minOrder - 1,
+    pinned: false
   }
 
   await clipboardCollection.upsert(itemToSave)
@@ -79,6 +81,45 @@ export async function updateTextItem(id: string, content: string): Promise<void>
   }
 
   // 使用 upsert 更新（传入 base 参数）
+  await clipboardCollection.upsert(updatedItem, existingItem)
+}
+
+/**
+ * 置顶/取消置顶项目
+ */
+export async function setPinStatus(id: string, pinned: boolean): Promise<void> {
+  const docs = await clipboardCollection.find({ id }).fetch()
+  if (docs.length === 0) return
+
+  const existingItem = docs[0] as any
+  let nextOrder = existingItem.order
+
+  const allItems = await getAllItems()
+  if (pinned) {
+    // 将置顶项放到置顶区域的最前
+    const pinnedOrders = allItems
+      .filter(item => item.pinned)
+      .map(item => normalizeOrder(item.order))
+      .filter(n => Number.isFinite(n))
+    const minPinnedOrder = pinnedOrders.length > 0 ? Math.min(...pinnedOrders) : 0
+    nextOrder = minPinnedOrder - 1
+  } else {
+    // 取消置顶，放到非置顶的末尾
+    const unpinnedOrders = allItems
+      .filter(item => !item.pinned || item.id === id)
+      .map(item => normalizeOrder(item.order))
+      .filter(n => Number.isFinite(n) && n !== Number.MAX_SAFE_INTEGER)
+    const maxUnpinnedOrder = unpinnedOrders.length > 0 ? Math.max(...unpinnedOrders) : 0
+    nextOrder = maxUnpinnedOrder + 1
+  }
+
+  const updatedItem = {
+    ...existingItem,
+    pinned,
+    order: nextOrder,
+    updatedAt: Date.now()
+  }
+
   await clipboardCollection.upsert(updatedItem, existingItem)
 }
 
@@ -114,21 +155,33 @@ export async function clearAllItems(): Promise<number> {
  * 更新项目顺序
  */
 export async function updateItemsOrder(items: ClipboardItem[]): Promise<void> {
-  // MiniDB 没有事务，我们顺序更新每个项目
+  const docs = await clipboardCollection.find({}).fetch()
+  const map = new Map<string, any>()
+  for (const doc of docs as any[]) {
+    if (doc?.id) {
+      map.set(doc.id as string, doc)
+    }
+  }
+
+  const docsToSave: any[] = []
+  const bases: any[] = []
+
   for (let i = 0; i < items.length; i++) {
     const item = items[i]
     if (!item) continue
-
-    // 查找现有项目
-    const docs = await clipboardCollection.find({ id: item.id }).fetch()
-    if (docs.length > 0) {
-      const existingItem = docs[0] as any
-      const updatedItem = {
-        ...existingItem,
-        order: i
-      }
-      await clipboardCollection.upsert(updatedItem, existingItem)
+    const base = map.get(item.id)
+    if (!base) continue
+    const updated = {
+      ...base,
+      order: i,
+      updatedAt: Date.now()
     }
+    docsToSave.push(updated)
+    bases.push(base)
+  }
+
+  if (docsToSave.length > 0) {
+    await clipboardCollection.upsert(docsToSave, bases)
   }
 }
 
@@ -187,6 +240,13 @@ function normalizeOrder(order: unknown): number {
 }
 
 function compareDocs(a: any, b: any): number {
+  const pinnedA = Boolean(a?.pinned)
+  const pinnedB = Boolean(b?.pinned)
+  if (pinnedA !== pinnedB) {
+    // 置顶的排在前面
+    return pinnedA ? -1 : 1
+  }
+
   const orderA = normalizeOrder(a?.order)
   const orderB = normalizeOrder(b?.order)
   if (orderA !== orderB) return orderA - orderB

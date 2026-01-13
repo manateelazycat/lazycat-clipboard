@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ClipboardItem } from '@/types/clipboard'
+import type { ClipboardItem, CopyMode } from '@/types/clipboard'
 import { isTextItem, isImageItem } from '@/types/clipboard'
 import TextPreview from './TextPreview.vue'
 import ImagePreview from './ImagePreview.vue'
@@ -7,51 +7,82 @@ import ImagePreview from './ImagePreview.vue'
 const props = defineProps<{
   item: ClipboardItem
   isSelected: boolean
+  multiSelectMode: boolean
+  copyMode: CopyMode
+  enablePin: boolean
 }>()
 
 const emit = defineEmits<{
   copy: []
   edit: []
+  togglePin: []
+  select: []
 }>()
 
 function handleClick() {
-  emit('copy')
+  emit('select')
+  if (props.copyMode === 'single-tap' && !props.multiSelectMode) {
+    emit('copy')
+  }
+}
+
+function handleDblClick() {
+  emit('select')
+  if (props.copyMode === 'double-tap' && !props.multiSelectMode) {
+    emit('copy')
+  }
+}
+
+function handleCopyButton(e: Event) {
+  e.stopPropagation()
+  emit('select')
+  if (!props.multiSelectMode) {
+    emit('copy')
+  }
 }
 
 function handleEdit(e: Event) {
   e.stopPropagation()
   emit('edit')
 }
+
+function handleTogglePin(e: Event) {
+  e.stopPropagation()
+  emit('togglePin')
+}
 </script>
 
 <template>
   <div
-    class="clipboard-item relative bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple)] p-4 cursor-pointer transition-all hover:shadow-[var(--shadow-apple-lg)] group overflow-hidden outline-none select-none"
+    :class="[
+      'clipboard-item relative rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple)] p-4 cursor-pointer transition-all hover:shadow-[var(--shadow-apple-lg)] group overflow-hidden outline-none select-none border border-[var(--color-apple-gray-100)] bg-white',
+      multiSelectMode && isSelected ? 'selected-multi' : '',
+      multiSelectMode && !isSelected ? 'unselected-multi' : ''
+    ]"
     @click="handleClick"
+    @dblclick="handleDblClick"
     @contextmenu.prevent
     tabindex="0"
     role="button"
     :aria-label="isTextItem(item) ? `复制文字: ${item.content.slice(0, 50)}` : '复制图片'"
   >
-    <!-- Selection indicator - orange left border -->
     <div
       v-if="isSelected"
       class="absolute left-1 top-2.5 bottom-2.5 w-1 bg-[var(--color-hermes-orange)] rounded-full"
     />
 
-    <!-- Content -->
     <div :class="isImageItem(item) ? 'pr-24' : 'pr-20'">
       <TextPreview v-if="isTextItem(item)" :content="item.content" />
       <ImagePreview v-else-if="isImageItem(item)" :blob="item.blob" />
     </div>
 
-    <!-- Action Buttons - Desktop (hover) -->
     <div
+      v-if="!multiSelectMode"
       class="absolute right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity max-md:hidden"
       :class="isImageItem(item) ? 'top-4' : 'top-1/2 -translate-y-1/2'"
     >
       <button
-        @click.stop="handleClick"
+        @click="handleCopyButton"
         class="p-2.5 rounded-lg hover:bg-[var(--color-apple-gray-100)] active:bg-[var(--color-apple-gray-200)] transition-colors"
         title="复制"
       >
@@ -67,18 +98,41 @@ function handleEdit(e: Event) {
       >
         <svg class="w-5 h-5 text-[var(--color-apple-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      </button>
+
+      <button
+        v-if="enablePin"
+        @click="handleTogglePin"
+        class="p-2.5 rounded-lg hover:bg-[var(--color-apple-gray-100)] active:bg-[var(--color-apple-gray-200)] transition-colors"
+        :title="item.pinned ? '取消置顶' : '置顶'"
+      >
+        <svg
+          v-if="item.pinned"
+          class="w-5 h-5 text-[var(--color-hermes-orange)]"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 00-1.175 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+        <svg
+          v-else
+          class="w-5 h-5 text-[var(--color-apple-gray-500)]"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 00-1.175 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
       </button>
     </div>
 
-    <!-- Touch device: show buttons only when selected -->
     <div
-      v-if="isSelected"
+      v-if="isSelected && !multiSelectMode"
       class="absolute right-4 flex gap-1 md:hidden"
       :class="isImageItem(item) ? 'top-4' : 'top-1/2 -translate-y-1/2'"
     >
       <button
-        @click.stop="handleClick"
+        @click="handleCopyButton"
         class="p-2.5 rounded-lg hover:bg-[var(--color-apple-gray-100)] active:bg-[var(--color-apple-gray-200)] transition-colors"
         title="复制"
       >
@@ -94,6 +148,30 @@ function handleEdit(e: Event) {
       >
         <svg class="w-5 h-5 text-[var(--color-apple-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      </button>
+
+      <button
+        v-if="enablePin"
+        @click="handleTogglePin"
+        class="p-2.5 rounded-lg hover:bg-[var(--color-apple-gray-100)] active:bg-[var(--color-apple-gray-200)] transition-colors"
+        :title="item.pinned ? '取消置顶' : '置顶'"
+      >
+        <svg
+          v-if="item.pinned"
+          class="w-5 h-5 text-[var(--color-hermes-orange)]"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 00-1.175 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+        <svg
+          v-else
+          class="w-5 h-5 text-[var(--color-apple-gray-500)]"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 00-1.175 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
       </button>
     </div>
@@ -108,5 +186,29 @@ function handleEdit(e: Event) {
 
 .clipboard-item img {
   -webkit-touch-callout: none;
+}
+
+.selected-multi {
+  background: var(--color-apple-gray-50);
+  border-color: var(--color-apple-gray-200);
+  box-shadow: 0 8px 20px -14px rgba(0, 0, 0, 0.35);
+  transform: translateY(-1px);
+  animation: float-select 0.4s ease;
+}
+
+.unselected-multi {
+  opacity: 0.92;
+}
+
+@keyframes float-select {
+  0% {
+    transform: translateY(2px);
+  }
+  60% {
+    transform: translateY(-2px);
+  }
+  100% {
+    transform: translateY(-1px);
+  }
 }
 </style>

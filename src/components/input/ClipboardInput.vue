@@ -3,6 +3,10 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useClipboardItems } from '@/composables/useClipboardItems'
 
 const { addText, addImage } = useClipboardItems()
+const emit = defineEmits<{
+  'open-settings': []
+  'toggle-multi': []
+}>()
 
 const textInput = ref('')
 const isDragging = ref(false)
@@ -103,7 +107,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="sticky top-6">
+  <div class="sticky">
     <div
       class="bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple)] p-6"
       :class="{ 'ring-2 ring-[var(--color-apple-blue)]': isDragging }"
@@ -176,6 +180,36 @@ onUnmounted(() => {
           <li>点击或回车即复制</li>
           <li>快捷键 ↑、↓、J、K、E</li>
         </ul>
+      </div>
+
+      <div class="mt-6 pt-6 border-t border-[var(--color-apple-gray-100)]">
+        <h3 class="text-lg font-semibold mb-4 text-[var(--color-apple-gray-900)]">
+          其他
+        </h3>
+        <div class="flex flex-wrap gap-2">
+          <button
+            class="inline-flex items-center gap-1 px-2 py-1 rounded-[var(--radius-apple)] text-[var(--color-apple-gray-700)] hover:bg-[var(--color-apple-gray-100)] transition-colors text-sm"
+            @click="emit('open-settings')"
+            title="设置中心"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            设置中心
+          </button>
+          <button
+            class="inline-flex items-center gap-1 px-2 py-1 rounded-[var(--radius-apple)] text-[var(--color-apple-gray-700)] hover:bg-[var(--color-apple-gray-100)] transition-colors text-sm"
+            @click="emit('toggle-multi')"
+            title="多选编辑"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 6h10M7 10h6M7 14h4M7 18h8" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.5 9.5L18 12l3.5-3.5" />
+            </svg>
+            多选编辑
+          </button>
+        </div>
       </div>
     </div>
   </div>
