@@ -1,8 +1,12 @@
 English | [简体中文](./README.zh-CN.md)
 
-# Lazycat Clipboard
+<div align="center">
+  <img src="public/lazycat-clipboard.svg" alt="Lazycat Clipboard Icon" width="120" height="120">
 
-A modern, elegant clipboard manager for seamless text and image sharing across devices.
+  # Lazycat Clipboard
+
+  A modern, elegant clipboard manager for seamless text and image sharing across devices.
+</div>
 
 ## Features
 

@@ -1,10 +1,12 @@
 [English](./README.md) | 简体中文
 
-# 懒猫剪贴板
+<div align="center">
+  <img src="public/lazycat-clipboard.svg" alt="懒猫剪贴板图标" width="120" height="120">
 
-[English](./README.md)
+  # 懒猫剪贴板
 
-一款现代、优雅的剪贴板管理器，实现跨设备无缝共享文字和图片。
+  一款现代、优雅的剪贴板管理器，实现跨设备无缝共享文字和图片。
+</div>
 
 ## 功能特点
 
