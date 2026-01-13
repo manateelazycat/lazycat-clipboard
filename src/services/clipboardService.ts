@@ -15,7 +15,7 @@ export async function getAllItems(): Promise<ClipboardItem[]> {
  */
 export async function addTextItem(content: string): Promise<TextClipboardItem> {
   const items = await getAllItems()
-  const minOrder = items.length > 0 ? Math.min(...items.map(i => i.order)) : 0
+  const maxOrder = items.length > 0 ? Math.max(...items.map(i => i.order)) : -1
 
   const itemToSave: TextClipboardItem = {
     id: uuidv4(),
@@ -23,7 +23,7 @@ export async function addTextItem(content: string): Promise<TextClipboardItem> {
     content,
     createdAt: Date.now(),
     updatedAt: Date.now(),
-    order: minOrder - 1
+    order: maxOrder + 1
   }
 
   await clipboardCollection.upsert(itemToSave)
@@ -35,7 +35,7 @@ export async function addTextItem(content: string): Promise<TextClipboardItem> {
  */
 export async function addImageItem(blob: Blob, mimeType: string): Promise<ImageClipboardItem> {
   const items = await getAllItems()
-  const minOrder = items.length > 0 ? Math.min(...items.map(i => i.order)) : 0
+  const maxOrder = items.length > 0 ? Math.max(...items.map(i => i.order)) : -1
 
   // 将 Blob 转换为 base64
   const imageData = await blobToBase64(blob)
@@ -47,7 +47,7 @@ export async function addImageItem(blob: Blob, mimeType: string): Promise<ImageC
     mimeType,
     createdAt: Date.now(),
     updatedAt: Date.now(),
-    order: minOrder - 1
+    order: maxOrder + 1
   }
 
   await clipboardCollection.upsert(itemToSave)

@@ -27,14 +27,14 @@ async function loadItems(options: { silent?: boolean } = {}) {
   async function addText(content: string) {
     if (!content.trim()) return
     const item = await clipboardService.addTextItem(content.trim())
-    items.value.unshift(item)
-    selectedIndex.value = 0
+    items.value.push(item)
+    selectedIndex.value = items.value.length - 1
   }
 
   async function addImage(blob: Blob, mimeType: string) {
     const item = await clipboardService.addImageItem(blob, mimeType)
-    items.value.unshift(item)
-    selectedIndex.value = 0
+    items.value.push(item)
+    selectedIndex.value = items.value.length - 1
   }
 
   async function updateText(id: string, content: string) {
