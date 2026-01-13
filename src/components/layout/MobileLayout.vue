@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import ClipboardList from '@/components/clipboard/ClipboardList.vue'
 import FloatingAddButton from '@/components/input/FloatingAddButton.vue'
 import { useClipboardItems } from '@/composables/useClipboardItems'
@@ -8,7 +7,6 @@ const emit = defineEmits<{
   'open-settings': []
 }>()
 
-const clipboardListRef = ref<InstanceType<typeof ClipboardList> | null>(null)
 const { isSyncing } = useClipboardItems()
 </script>
 

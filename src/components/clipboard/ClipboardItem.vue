@@ -46,10 +46,6 @@ function handleEdit(e: Event) {
   emit('edit')
 }
 
-function handleTogglePin(e: Event) {
-  e.stopPropagation()
-  emit('togglePin')
-}
 </script>
 
 <template>
