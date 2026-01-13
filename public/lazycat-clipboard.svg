@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Background circle with Claude's warm color -->
+  <circle cx="100" cy="100" r="95" fill="#CC785C" opacity="0.1"/>
+
+  <!-- Clipboard body -->
+  <rect x="50" y="40" width="100" height="130" rx="8" fill="#CC785C" opacity="0.9"/>
+  <rect x="55" y="45" width="90" height="120" rx="6" fill="#FFF5F0"/>
+
+  <!-- Clipboard clip -->
+  <rect x="75" y="30" width="50" height="25" rx="4" fill="#CC785C"/>
+  <rect x="80" y="35" width="40" height="15" rx="3" fill="#FFF5F0"/>
+
+  <!-- Content lines representing clipboard items -->
+  <line x1="70" y1="70" x2="130" y2="70" stroke="#CC785C" stroke-width="4" stroke-linecap="round"/>
+  <line x1="70" y1="90" x2="120" y2="90" stroke="#CC785C" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <line x1="70" y1="110" x2="125" y2="110" stroke="#CC785C" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Small decorative element - cat paw print -->
+  <g transform="translate(115, 135)" opacity="0.6">
+    <circle cx="0" cy="0" r="4" fill="#CC785C"/>
+    <circle cx="-6" cy="6" r="3" fill="#CC785C"/>
+    <circle cx="6" cy="6" r="3" fill="#CC785C"/>
+    <circle cx="-3" cy="10" r="2.5" fill="#CC785C"/>
+    <circle cx="3" cy="10" r="2.5" fill="#CC785C"/>
+  </g>
+</svg>

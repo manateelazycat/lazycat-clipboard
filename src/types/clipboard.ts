@@ -15,11 +15,21 @@ export interface TextClipboardItem extends BaseClipboardItem {
 
 export interface ImageClipboardItem extends BaseClipboardItem {
   type: 'image'
-  blob: Blob
+  imageData: string // base64 data URL
   mimeType: string
+  blob?: Blob // 运行时使用的 Blob，不会持久化
 }
 
 export type ClipboardItem = TextClipboardItem | ImageClipboardItem
+
+export interface ClipboardMetadata {
+  total: number
+  textCount: number
+  imageCount: number
+  latestCreatedAt?: number
+  latestUpdatedAt?: number
+  estimatedBytes: number
+}
 
 export function isTextItem(item: ClipboardItem): item is TextClipboardItem {
   return item.type === 'text'

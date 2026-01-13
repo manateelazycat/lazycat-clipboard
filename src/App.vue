@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { ref, provide, computed, watch } from 'vue'
+import { ref, provide, computed, watch, onMounted, onUnmounted } from 'vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import EditModal from '@/components/modals/EditModal.vue'
 import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog.vue'
 import AddItemModal from '@/components/modals/AddItemModal.vue'
+import DebugTools from '@/components/debug/DebugTools.vue'
 import { useClipboardItems } from '@/composables/useClipboardItems'
 import { useClipboard } from '@/composables/useClipboard'
 import type { ClipboardItem } from '@/types/clipboard'
 import { isTextItem } from '@/types/clipboard'
 
-const { updateText, deleteItem } = useClipboardItems()
+const { updateText, deleteItem, loadItems, isLoading } = useClipboardItems()
 const { lastCopyMessage, copyEventId } = useClipboard()
+const showDebugTools = import.meta.env.VITE_SHOW_DEBUG_TOOLS === 'true'
 
 // Modal states
 const editModalVisible = ref(false)
@@ -27,6 +29,28 @@ const toastMessage = ref('')
 const isModalOpen = computed(() =>
   editModalVisible.value || deleteConfirmVisible.value || addModalVisible.value
 )
+
+// 定时自动刷新，避免编辑时刷新覆盖内容
+let refreshTimer: number | null = null
+
+async function refreshIfIdle() {
+  if (isModalOpen.value) return
+  if (isLoading.value) return
+  await loadItems({ silent: true })
+}
+
+onMounted(() => {
+  refreshTimer = window.setInterval(() => {
+    refreshIfIdle().catch(err => console.warn('自动刷新失败', err))
+  }, 3000)
+})
+
+onUnmounted(() => {
+  if (refreshTimer) {
+    clearInterval(refreshTimer)
+    refreshTimer = null
+  }
+})
 
 // Provide modal functions to children
 function showEditModal(item: ClipboardItem) {
@@ -104,6 +128,8 @@ watch(copyEventId, () => {
 
 <template>
   <AppLayout />
+
+  <DebugTools v-if="showDebugTools" />
 
   <!-- Modals -->
   <EditModal

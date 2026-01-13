@@ -34,7 +34,11 @@ async function handleCopy(index: number) {
   if (isTextItem(item)) {
     await copyText(item.content)
   } else if (isImageItem(item)) {
-    await copyImage(item.blob)
+    if (item.blob) {
+      await copyImage(item.blob)
+    } else {
+      console.warn('未找到可复制的图片数据')
+    }
   }
 }
 

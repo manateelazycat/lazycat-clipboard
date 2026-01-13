@@ -7,14 +7,22 @@ const selectedIndex = ref(-1)
 const isLoading = ref(false)
 
 export function useClipboardItems() {
-  async function loadItems() {
+async function loadItems(options: { silent?: boolean } = {}) {
+  const silent = options.silent ?? false
+  if (!silent) {
     isLoading.value = true
-    try {
-      items.value = await clipboardService.getAllItems()
-    } finally {
+  }
+  try {
+    const newItems = await clipboardService.getAllItems()
+    if (!itemsEqual(items.value, newItems)) {
+      items.value = newItems
+    }
+  } finally {
+    if (!silent) {
       isLoading.value = false
     }
   }
+}
 
   async function addText(content: string) {
     if (!content.trim()) return
@@ -53,6 +61,21 @@ export function useClipboardItems() {
   async function reorderItems(newItems: ClipboardItem[]) {
     items.value = newItems
     await clipboardService.updateItemsOrder(newItems)
+  }
+
+  async function clearAll() {
+    isLoading.value = true
+    try {
+      await clipboardService.clearAllItems()
+      items.value = []
+      selectedIndex.value = -1
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function getMetadata() {
+    return clipboardService.getMetadata()
   }
 
   function selectNext() {
@@ -97,9 +120,29 @@ export function useClipboardItems() {
     updateText,
     deleteItem,
     reorderItems,
+    clearAll,
+    getMetadata,
     selectNext,
     selectPrevious,
     selectIndex,
-    clearSelection
+  clearSelection
+}
+}
+
+function itemsEqual(a: ClipboardItem[], b: ClipboardItem[]) {
+  if (a.length !== b.length) return false
+  for (let i = 0; i < a.length; i++) {
+    const itemA = a[i]
+    const itemB = b[i]
+    if (!itemA || !itemB) return false
+    if (
+      itemA.id !== itemB.id ||
+      itemA.type !== itemB.type ||
+      itemA.updatedAt !== itemB.updatedAt ||
+      itemA.order !== itemB.order
+    ) {
+      return false
+    }
   }
+  return true
 }

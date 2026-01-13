@@ -165,7 +165,13 @@ onUnmounted(() => {
               tabindex="0"
               class="rounded-[var(--radius-apple)] focus:outline-none focus:ring-2 focus:ring-[var(--color-hermes-orange)]"
             >
-              <ImagePreview :blob="item.blob" />
+              <ImagePreview
+                v-if="item.blob"
+                :blob="item.blob"
+              />
+              <p v-else class="text-sm text-[var(--color-apple-gray-500)]">
+                图片数据加载中，请稍候再试
+              </p>
             </div>
           </div>
 

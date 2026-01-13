@@ -1,16 +1,10 @@
-import Dexie, { type Table } from 'dexie'
-import type { ClipboardItem } from '@/types/clipboard'
+import { MiniDB } from '@lazycatcloud/minidb'
 
-class ClipboardDatabase extends Dexie {
-  items!: Table<ClipboardItem, string>
+// 初始化 MiniDB
+const db = new MiniDB()
 
-  constructor() {
-    super('lazycat-clipboard')
+// 获取剪贴板项目集合
+export const clipboardCollection = db.getCollection('clipboard-items')
 
-    this.version(1).stores({
-      items: 'id, type, createdAt, updatedAt, order'
-    })
-  }
-}
-
-export const db = new ClipboardDatabase()
+// 导出 db 实例以便调试使用
+export { db }

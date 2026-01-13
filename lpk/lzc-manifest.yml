@@ -1,0 +1,18 @@
+package: manateelazycat.lzcapp.clipboard
+version: 1.0.0
+name: 懒猫剪贴板
+description: 一款现代、优雅的剪贴板管理器，实现跨设备无缝共享文字和图片。
+author: manateelazycat
+application:
+  subdomain: clipboard
+  routes:
+    - /=file:///lzcapp/pkg/content/  
+
+
+locales:
+  zh:
+    name: "懒猫剪贴板"
+    description: "一款现代、优雅的剪贴板管理器，实现跨设备无缝共享文字和图片。"
+  en:
+    name: "Lazycat Clipboard"
+    description: "A modern, elegant clipboard manager for seamless text and image sharing across devices."

@@ -1,20 +1,33 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 const props = defineProps<{
-  blob: Blob
+  blob?: Blob
 }>()
 
 const imageUrl = ref('')
 
-onMounted(() => {
-  imageUrl.value = URL.createObjectURL(props.blob)
-})
-
-onUnmounted(() => {
+function revokeUrl() {
   if (imageUrl.value) {
     URL.revokeObjectURL(imageUrl.value)
   }
+}
+
+function updateUrl(blob?: Blob) {
+  revokeUrl()
+  imageUrl.value = blob ? URL.createObjectURL(blob) : ''
+}
+
+onMounted(() => {
+  updateUrl(props.blob)
+})
+
+watch(() => props.blob, (newBlob) => {
+  updateUrl(newBlob)
+})
+
+onUnmounted(() => {
+  revokeUrl()
 })
 </script>
 
