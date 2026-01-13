@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, inject, onMounted, onUnmounted } from 'vue'
 import { useClipboardItems } from '@/composables/useClipboardItems'
 
 const props = defineProps<{
@@ -11,6 +11,7 @@ const emit = defineEmits<{
 }>()
 
 const { addText, addImage } = useClipboardItems()
+const scrollListToTop = inject<() => void>('scrollListToTop')
 
 const textInput = ref('')
 
@@ -18,6 +19,7 @@ async function handleSubmit() {
   if (textInput.value.trim()) {
     await addText(textInput.value)
     textInput.value = ''
+    scrollListToTop?.()
     emit('close')
   }
 }
@@ -31,6 +33,7 @@ async function handleFileSelect(e: Event) {
         await addImage(file, file.type)
       }
     }
+    scrollListToTop?.()
     emit('close')
   }
   input.value = ''

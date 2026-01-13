@@ -62,12 +62,39 @@ function handleEdit(e: Event) {
     role="button"
     :aria-label="isTextItem(item) ? `复制文字: ${item.content.slice(0, 50)}` : '复制图片'"
   >
+    <!-- Desktop: orange line when selected -->
     <div
       v-if="isSelected"
-      class="absolute left-1 top-2.5 bottom-2.5 w-1 bg-[var(--color-hermes-orange)] rounded-full"
+      class="absolute left-1 top-2.5 bottom-2.5 w-1 bg-[var(--color-hermes-orange)] rounded-full max-md:hidden"
     />
 
-    <div :class="isImageItem(item) ? 'pr-24' : 'pr-20'">
+    <!-- Mobile: orange 6-dot drag handle when selected (replaces line) -->
+    <div
+      v-if="isSelected && !multiSelectMode"
+      class="drag-handle absolute left-1.5 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 py-1.5 md:hidden cursor-grab active:cursor-grabbing z-10"
+    >
+      <div class="flex gap-0.5">
+        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
+        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
+      </div>
+      <div class="flex gap-0.5">
+        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
+        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
+      </div>
+      <div class="flex gap-0.5">
+        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
+        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
+      </div>
+    </div>
+
+    <div
+      :class="[
+        // Desktop (md+): always has padding for hover buttons
+        isImageItem(item) ? 'md:pr-24' : 'md:pr-20',
+        // Mobile: padding only when selected (drag handle + buttons visible)
+        isSelected && !multiSelectMode ? (isImageItem(item) ? 'max-md:pr-24 max-md:pl-1.5' : 'max-md:pr-20 max-md:pl-1.5') : ''
+      ]"
+    >
       <TextPreview v-if="isTextItem(item)" :content="item.content" />
       <ImagePreview v-else-if="isImageItem(item)" :blob="item.blob" />
     </div>
@@ -79,7 +106,7 @@ function handleEdit(e: Event) {
     >
       <button
         @click="handleCopyButton"
-        class="p-2.5 rounded-lg hover:bg-[var(--color-apple-gray-100)] active:bg-[var(--color-apple-gray-200)] transition-colors"
+        class="item-btn p-2.5 rounded-lg active:bg-[var(--color-apple-gray-200)] transition-colors"
         title="复制"
       >
         <svg class="w-5 h-5 text-[var(--color-apple-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +116,7 @@ function handleEdit(e: Event) {
 
       <button
         @click="handleEdit"
-        class="p-2.5 rounded-lg hover:bg-[var(--color-apple-gray-100)] active:bg-[var(--color-apple-gray-200)] transition-colors"
+        class="item-btn p-2.5 rounded-lg active:bg-[var(--color-apple-gray-200)] transition-colors"
         title="编辑"
       >
         <svg class="w-5 h-5 text-[var(--color-apple-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,7 +132,7 @@ function handleEdit(e: Event) {
     >
       <button
         @click="handleCopyButton"
-        class="p-2.5 rounded-lg hover:bg-[var(--color-apple-gray-100)] active:bg-[var(--color-apple-gray-200)] transition-colors"
+        class="item-btn p-2.5 rounded-lg active:bg-[var(--color-apple-gray-200)] transition-colors"
         title="复制"
       >
         <svg class="w-5 h-5 text-[var(--color-apple-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,7 +142,7 @@ function handleEdit(e: Event) {
 
       <button
         @click="handleEdit"
-        class="p-2.5 rounded-lg hover:bg-[var(--color-apple-gray-100)] active:bg-[var(--color-apple-gray-200)] transition-colors"
+        class="item-btn p-2.5 rounded-lg active:bg-[var(--color-apple-gray-200)] transition-colors"
         title="编辑"
       >
         <svg class="w-5 h-5 text-[var(--color-apple-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,6 +161,13 @@ function handleEdit(e: Event) {
 
 .clipboard-item img {
   -webkit-touch-callout: none;
+}
+
+/* Only apply hover effect on devices that support true hover (not touch) */
+@media (hover: hover) {
+  .item-btn:hover {
+    background-color: var(--color-apple-gray-100);
+  }
 }
 
 .selected-multi {

@@ -13,6 +13,10 @@ const syncLock = ref(false) // 控制写操作/刷新
 let syncHideTimer: number | null = null
 const MIN_SYNC_MS = 400
 
+// Mobile detection
+const isMobile = typeof window !== 'undefined' &&
+  ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+
 async function withSync(fn: () => Promise<void>) {
   if (syncLock.value) return
   syncLock.value = true
@@ -76,7 +80,10 @@ export function useClipboardItems() {
     await withSync(async () => {
       await clipboardService.addTextItem(content.trim())
       await loadItems({ silent: true })
-      selectedIndex.value = 0
+      // Only auto-select on desktop, not on mobile
+      if (!isMobile) {
+        selectedIndex.value = 0
+      }
     })
   }
 
@@ -84,7 +91,10 @@ export function useClipboardItems() {
     await withSync(async () => {
       await clipboardService.addImageItem(blob, mimeType)
       await loadItems({ silent: true })
-      selectedIndex.value = 0
+      // Only auto-select on desktop, not on mobile
+      if (!isMobile) {
+        selectedIndex.value = 0
+      }
     })
   }
 

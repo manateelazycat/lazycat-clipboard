@@ -37,6 +37,12 @@ const multiSelectMode = ref(false)
 const containerRef = ref<HTMLElement | null>(null)
 const skipNextDocumentExit = ref(false)
 
+// Mobile detection
+const isMobile = ref(
+  typeof window !== 'undefined' &&
+  ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+)
+
 async function handleCopy(index: number) {
   if (multiSelectMode.value) return
   const item = items.value[index]
@@ -84,8 +90,21 @@ async function handleTogglePin(index: number) {
   await togglePin(item.id, !item.pinned)
 }
 
+// Track the dragged item for re-selection after drag
+const draggedItemId = ref<string | null>(null)
+
 async function handleDragEnd() {
   if (multiSelectMode.value) return
+
+  // Re-select the dragged item at its new position
+  if (draggedItemId.value && isMobile.value) {
+    const newIndex = items.value.findIndex(item => item.id === draggedItemId.value)
+    if (newIndex !== -1) {
+      selectIndex(newIndex)
+    }
+  }
+  draggedItemId.value = null
+
   try {
     await reorderItems([...items.value])
   } catch (error) {
@@ -93,8 +112,16 @@ async function handleDragEnd() {
   }
 }
 
-function handleDragStart() {
+function handleDragStart(e: any) {
   if (multiSelectMode.value) return
+
+  // Remember which item is being dragged
+  const draggedIndex = e.oldIndex
+  if (draggedIndex !== undefined && items.value[draggedIndex]) {
+    draggedItemId.value = items.value[draggedIndex].id
+  }
+
+  // Vibrate on mobile
   if (navigator.vibrate) {
     navigator.vibrate(50)
   }
@@ -184,14 +211,14 @@ useKeyboardShortcuts({
   isModalOpen: isModalOpen as any
 })
 
+// Drag options - use handle for mobile, free drag for desktop
 const dragOptions = computed(() => ({
   animation: 200,
   group: 'clipboard-items',
   disabled: multiSelectMode.value || syncLock.value,
   ghostClass: 'ghost',
-  delay: 0,
-  delayOnTouchOnly: true,
-  touchStartThreshold: 20,
+  // Mobile: use drag handle, Desktop: drag anywhere
+  handle: isMobile.value ? '.drag-handle' : undefined,
   forceFallback: true,
   fallbackTolerance: 5
 }))
@@ -236,10 +263,18 @@ defineExpose({
 
 function handleBackgroundClick(e: MouseEvent) {
   const target = e.target as HTMLElement
-  if (!multiSelectMode.value || bulkDialogVisible.value) return
+  if (bulkDialogVisible.value) return
   if (target.closest('.clipboard-item')) return
   if (target.closest('.multi-select-bar')) return
-  exitMultiSelect()
+
+  // In multiSelectMode, exit multi select
+  if (multiSelectMode.value) {
+    exitMultiSelect()
+    return
+  }
+
+  // Otherwise, just deselect all items
+  selectedIndex.value = -1
 }
 
 function handleDocumentClick(e: MouseEvent) {
@@ -353,7 +388,7 @@ onUnmounted(() => {
       item-key="id"
       @start="handleDragStart"
       @end="handleDragEnd"
-      class="space-y-3"
+      class="space-y-3 pb-24 md:pb-0"
     >
       <template #item="{ element, index }">
         <ClipboardItemComponent
@@ -377,18 +412,5 @@ onUnmounted(() => {
 .ghost {
   opacity: 0.5;
   background: var(--color-apple-gray-100);
-}
-
-.animate-spin-smooth {
-  animation: spin-smooth 0.9s linear infinite;
-}
-
-@keyframes spin-smooth {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>

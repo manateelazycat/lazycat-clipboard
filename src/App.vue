@@ -10,7 +10,7 @@ import { useClipboard } from '@/composables/useClipboard'
 import type { ClipboardItem } from '@/types/clipboard'
 import { isTextItem } from '@/types/clipboard'
 
-const { updateText, deleteItem, loadItems, isLoading, syncLock } = useClipboardItems()
+const { updateText, deleteItem, loadItems, isLoading, syncLock, clearSelection } = useClipboardItems()
 const { lastCopyMessage, copyEventId } = useClipboard()
 const showDebugTools = import.meta.env.VITE_SHOW_DEBUG_TOOLS === 'true' || import.meta.env.DEV
 
@@ -29,6 +29,15 @@ const toastMessage = ref('')
 const isModalOpen = computed(() =>
   editModalVisible.value || deleteConfirmVisible.value || addModalVisible.value
 )
+
+// Scroll to top function registration (for mobile)
+const scrollToTopFn = ref<(() => void) | null>(null)
+function registerScrollToTop(fn: () => void) {
+  scrollToTopFn.value = fn
+}
+function scrollListToTop() {
+  scrollToTopFn.value?.()
+}
 
 // 定时自动刷新，避免编辑时刷新覆盖内容
 let refreshTimer: number | null = null
@@ -65,6 +74,7 @@ function showDeleteConfirm(item: ClipboardItem) {
 }
 
 function showAddModal() {
+  clearSelection()
   addModalVisible.value = true
 }
 
@@ -72,6 +82,8 @@ provide('showEditModal', showEditModal)
 provide('showDeleteConfirm', showDeleteConfirm)
 provide('showAddModal', showAddModal)
 provide('isModalOpen', isModalOpen)
+provide('registerScrollToTop', registerScrollToTop)
+provide('scrollListToTop', scrollListToTop)
 
 // Handle edit modal events
 async function handleEditSave(content: string) {
