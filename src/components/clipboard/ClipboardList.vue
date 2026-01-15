@@ -97,7 +97,7 @@ async function handleDragEnd() {
   if (multiSelectMode.value) return
 
   // Re-select the dragged item at its new position
-  if (draggedItemId.value && isMobile.value) {
+  if (draggedItemId.value) {
     const newIndex = items.value.findIndex(item => item.id === draggedItemId.value)
     if (newIndex !== -1) {
       selectIndex(newIndex)
