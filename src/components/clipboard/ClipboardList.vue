@@ -120,11 +120,6 @@ function handleDragStart(e: any) {
   if (draggedIndex !== undefined && items.value[draggedIndex]) {
     draggedItemId.value = items.value[draggedIndex].id
   }
-
-  // Vibrate on mobile
-  if (navigator.vibrate) {
-    navigator.vibrate(50)
-  }
 }
 
 function handleSelectOnly(index: number) {

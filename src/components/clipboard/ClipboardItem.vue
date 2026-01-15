@@ -46,6 +46,16 @@ function handleEdit(e: Event) {
   emit('edit')
 }
 
+function handleDragHandleClick(e: Event) {
+  e.stopPropagation()
+}
+
+function handleDragHandleTouchStart() {
+  if (navigator.vibrate) {
+    navigator.vibrate(50)
+  }
+}
+
 </script>
 
 <template>
@@ -68,22 +78,24 @@ function handleEdit(e: Event) {
       class="absolute left-1 top-2.5 bottom-2.5 w-1 bg-[var(--color-hermes-orange)] rounded-full max-md:hidden"
     />
 
-    <!-- Mobile: orange 6-dot drag handle when selected (replaces line) -->
+    <!-- Mobile: 6-dot drag handle (gray default, orange when selected) -->
     <div
-      v-if="isSelected && !multiSelectMode"
-      class="drag-handle absolute left-1.5 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 py-1.5 md:hidden cursor-grab active:cursor-grabbing z-10"
+      v-if="!multiSelectMode"
+      class="drag-handle absolute left-[10px] top-1/2 -translate-y-1/2 flex flex-col gap-0.5 py-1.5 md:hidden cursor-grab active:cursor-grabbing z-10"
+      @click.stop="handleDragHandleClick"
+      @touchstart="handleDragHandleTouchStart"
     >
       <div class="flex gap-0.5">
-        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
-        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
+        <span :class="['w-1 h-1 rounded-full', isSelected ? 'bg-[var(--color-hermes-orange)]' : 'bg-[var(--color-apple-gray-200)]']"></span>
+        <span :class="['w-1 h-1 rounded-full', isSelected ? 'bg-[var(--color-hermes-orange)]' : 'bg-[var(--color-apple-gray-200)]']"></span>
       </div>
       <div class="flex gap-0.5">
-        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
-        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
+        <span :class="['w-1 h-1 rounded-full', isSelected ? 'bg-[var(--color-hermes-orange)]' : 'bg-[var(--color-apple-gray-200)]']"></span>
+        <span :class="['w-1 h-1 rounded-full', isSelected ? 'bg-[var(--color-hermes-orange)]' : 'bg-[var(--color-apple-gray-200)]']"></span>
       </div>
       <div class="flex gap-0.5">
-        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
-        <span class="w-1 h-1 rounded-full bg-[var(--color-hermes-orange)]"></span>
+        <span :class="['w-1 h-1 rounded-full', isSelected ? 'bg-[var(--color-hermes-orange)]' : 'bg-[var(--color-apple-gray-200)]']"></span>
+        <span :class="['w-1 h-1 rounded-full', isSelected ? 'bg-[var(--color-hermes-orange)]' : 'bg-[var(--color-apple-gray-200)]']"></span>
       </div>
     </div>
 
@@ -91,8 +103,8 @@ function handleEdit(e: Event) {
       :class="[
         // Desktop (md+): always has padding for hover buttons
         isImageItem(item) ? 'md:pr-24' : 'md:pr-20',
-        // Mobile: padding only when selected (drag handle + buttons visible)
-        isSelected && !multiSelectMode ? (isImageItem(item) ? 'max-md:pr-24 max-md:pl-1.5' : 'max-md:pr-20 max-md:pl-1.5') : ''
+        // Mobile: content padding 10px on both sides, no extra padding when selected (buttons overlay content)
+        !multiSelectMode ? 'max-md:px-[10px]' : ''
       ]"
     >
       <TextPreview v-if="isTextItem(item)" :content="item.content" />
@@ -127,12 +139,11 @@ function handleEdit(e: Event) {
 
     <div
       v-if="isSelected && !multiSelectMode"
-      class="absolute right-4 flex gap-1 md:hidden"
-      :class="isImageItem(item) ? 'top-4' : 'top-1/2 -translate-y-1/2'"
+      class="absolute right-0 top-0 bottom-0 flex items-center gap-1 pr-4 pl-8 md:hidden bg-gradient-to-l from-white from-60% to-transparent"
     >
       <button
         @click="handleCopyButton"
-        class="item-btn p-2.5 rounded-lg transition-colors"
+        class="item-btn p-2.5 rounded-lg transition-colors bg-white"
         title="复制"
       >
         <svg class="w-5 h-5 text-[var(--color-apple-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,7 +153,7 @@ function handleEdit(e: Event) {
 
       <button
         @click="handleEdit"
-        class="item-btn p-2.5 rounded-lg transition-colors"
+        class="item-btn p-2.5 rounded-lg transition-colors bg-white"
         title="编辑"
       >
         <svg class="w-5 h-5 text-[var(--color-apple-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
