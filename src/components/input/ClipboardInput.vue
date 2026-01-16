@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useClipboardItems } from '@/composables/useClipboardItems'
+import { useClipboard } from '@/composables/useClipboard'
 
 const { addText, addImage } = useClipboardItems()
+const { readFromClipboard } = useClipboard()
 const emit = defineEmits<{
   'open-settings': []
   'toggle-multi': []
@@ -81,7 +83,7 @@ async function handleFileSelect(e: Event) {
   input.value = ''
 }
 
-// Handle Ctrl+V paste for images
+// Handle Ctrl+V paste for images and text
 async function handlePaste(e: ClipboardEvent) {
   const items = e.clipboardData?.items
   if (!items) return
@@ -93,16 +95,40 @@ async function handlePaste(e: ClipboardEvent) {
       if (blob) {
         await addImage(blob, item.type)
       }
+    } else if (item.type === 'text/plain') {
+      e.preventDefault()
+      const text = e.clipboardData?.getData('text/plain')
+      if (text) {
+        textInput.value += text
+        focusInput()
+      }
     }
+  }
+}
+
+// Auto-fill clipboard content when page gains focus
+async function handleWindowFocus() {
+  try {
+    const clipboardData = await readFromClipboard()
+    if (clipboardData && clipboardData.type === 'text' && clipboardData.content) {
+      if (textInput.value.trim() === '') {
+        textInput.value = clipboardData.content
+      }
+      focusInput()
+    }
+  } catch (err) {
+    console.error('Failed to read clipboard on focus:', err)
   }
 }
 
 onMounted(() => {
   document.addEventListener('paste', handlePaste)
+  window.addEventListener('focus', handleWindowFocus)
 })
 
 onUnmounted(() => {
   document.removeEventListener('paste', handlePaste)
+  window.removeEventListener('focus', handleWindowFocus)
 })
 </script>
 
@@ -121,6 +147,7 @@ onUnmounted(() => {
 
       <div class="relative">
         <textarea
+          spellcheck="false"
           ref="textareaRef"
           v-model="textInput"
           placeholder="请输入需要发送的文字"
@@ -195,5 +222,8 @@ onUnmounted(() => {
 .tooltip-leave-to {
   opacity: 0;
   transform: translate(-50%, 4px);
+}
+textarea {
+  word-break: break-all;
 }
 </style>

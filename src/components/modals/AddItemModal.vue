@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, inject, onMounted, onUnmounted } from 'vue'
 import { useClipboardItems } from '@/composables/useClipboardItems'
+import { useClipboard } from '@/composables/useClipboard'
 
 const props = defineProps<{
   visible: boolean
@@ -11,6 +12,7 @@ const emit = defineEmits<{
 }>()
 
 const { addText, addImage } = useClipboardItems()
+const { readFromClipboard } = useClipboard()
 const scrollListToTop = inject<() => void>('scrollListToTop')
 
 const textInput = ref('')
@@ -50,6 +52,20 @@ function handleKeyDown(e: KeyboardEvent) {
   }
 }
 
+// Auto-fill clipboard content when modal opens
+async function autoFillClipboard() {
+  try {
+    const clipboardData = await readFromClipboard()
+    if (clipboardData && clipboardData.type === 'text' && clipboardData.content) {
+      if (textInput.value.trim() === '') {
+        textInput.value = clipboardData.content
+      }
+    }
+  } catch (err) {
+    console.error('Failed to read clipboard:', err)
+  }
+}
+
 // Handle mobile back button
 function handlePopState() {
   if (props.visible) {
@@ -58,10 +74,12 @@ function handlePopState() {
 }
 
 // Push history state when modal opens, so back button closes it
-watch(() => props.visible, (newVal, oldVal) => {
+watch(() => props.visible, async (newVal, oldVal) => {
   if (newVal && !oldVal) {
     // Modal opened - push state
     history.pushState({ modal: 'add' }, '')
+    // Auto-fill clipboard content when modal opens
+    await autoFillClipboard()
   } else if (!newVal && oldVal) {
     // Modal closed - go back if we pushed state
     if (history.state?.modal === 'add') {
@@ -114,6 +132,7 @@ onUnmounted(() => {
           <!-- Content -->
           <div class="p-4">
             <textarea
+              spellcheck="false"
               v-model="textInput"
               placeholder="请输入需要发送的文字"
               class="w-full h-32 p-3 border border-[var(--color-apple-gray-100)] rounded-[var(--radius-apple)] resize-none focus:outline-none focus:ring-1 focus:ring-[var(--color-hermes-orange)] focus:border-transparent text-[var(--color-apple-gray-900)] placeholder-[var(--color-apple-gray-500)]"
