@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import DesktopLayout from './DesktopLayout.vue'
 import MobileLayout from './MobileLayout.vue'
+import LightAppCloseButton from './LightAppCloseButton.vue'
 import SettingsCenter from '@/components/settings/SettingsCenter.vue'
 
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
@@ -24,6 +25,8 @@ onUnmounted(() => {
 
 <template>
   <div class="min-h-screen bg-[var(--color-apple-gray-50)]">
+    <LightAppCloseButton />
+
     <MobileLayout v-if="isMobile" @open-settings="showSettings = true" />
     <DesktopLayout v-else @open-settings="showSettings = true" />
 

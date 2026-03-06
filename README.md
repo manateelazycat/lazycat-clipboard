@@ -38,26 +38,27 @@ English | [简体中文](./README.zh-CN.md)
 # Clone the repository
 git clone https://github.com/aspect-apps/lazycat-clipboard.git
 
+# Copy code to devshell
+cd lazycat-clipboard/lpk
+
+lzc-cli project devshell -f
+
 # Navigate to project directory
 cd lazycat-clipboard
 
 # Install dependencies
 npm install
 
-# Start development server
+# Start server
 npm run dev
 ```
 
 ### Build for Production
 
 ```bash
-npm run build
-```
-
-### Preview Production Build
-
-```bash
-npm run preview
+cd lpk
+update lzc-manifest.yml version
+lzc-cli project build
 ```
 
 ## Keyboard Shortcuts

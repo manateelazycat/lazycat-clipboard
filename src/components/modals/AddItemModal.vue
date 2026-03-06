@@ -15,12 +15,16 @@ const scrollListToTop = inject<() => void>('scrollListToTop')
 
 const textInput = ref('')
 
-async function handleSubmit() {
-  if (textInput.value.trim()) {
-    await addText(textInput.value)
+function handleSubmit() {
+  const trimmed = textInput.value.trim()
+  if (trimmed) {
     textInput.value = ''
     scrollListToTop?.()
     emit('close')
+    void addText(trimmed).catch(error => {
+      console.error('弹窗发送文字失败', error)
+      textInput.value = trimmed
+    })
   }
 }
 

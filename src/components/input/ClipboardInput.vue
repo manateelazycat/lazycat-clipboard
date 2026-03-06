@@ -13,11 +13,15 @@ const isDragging = ref(false)
 const showEmptyTooltip = ref(false)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
-async function handleSubmit() {
-  if (textInput.value.trim()) {
-    await addText(textInput.value)
+function handleSubmit() {
+  const trimmed = textInput.value.trim()
+  if (trimmed) {
     textInput.value = ''
     showEmptyTooltip.value = false
+    void addText(trimmed).catch(error => {
+      console.error('发送文字失败', error)
+      textInput.value = trimmed
+    })
   } else {
     showEmptyTooltip.value = true
     setTimeout(() => {
@@ -64,7 +68,9 @@ async function handleDrop(e: DragEvent) {
 
   const text = e.dataTransfer?.getData('text/plain')
   if (text) {
-    await addText(text)
+    void addText(text).catch(error => {
+      console.error('拖拽发送文字失败', error)
+    })
   }
 }
 

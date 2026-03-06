@@ -4,7 +4,6 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import EditModal from '@/components/modals/EditModal.vue'
 import DeleteConfirmDialog from '@/components/modals/DeleteConfirmDialog.vue'
 import AddItemModal from '@/components/modals/AddItemModal.vue'
-import DebugTools from '@/components/debug/DebugTools.vue'
 import { useClipboardItems } from '@/composables/useClipboardItems'
 import { useClipboard } from '@/composables/useClipboard'
 import type { ClipboardItem } from '@/types/clipboard'
@@ -12,7 +11,6 @@ import { isTextItem } from '@/types/clipboard'
 
 const { updateText, deleteItem, loadItems, isLoading, syncLock, clearSelection } = useClipboardItems()
 const { lastCopyMessage, copyEventId } = useClipboard()
-const showDebugTools = import.meta.env.VITE_SHOW_DEBUG_TOOLS === 'true' || import.meta.env.DEV
 
 // Modal states
 const editModalVisible = ref(false)
@@ -141,8 +139,6 @@ watch(copyEventId, () => {
 
 <template>
   <AppLayout />
-
-  <DebugTools v-if="showDebugTools" />
 
   <!-- Modals -->
   <EditModal

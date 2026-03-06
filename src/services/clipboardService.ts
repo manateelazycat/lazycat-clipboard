@@ -2,6 +2,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { clipboardCollection } from './db'
 import type { ClipboardItem, TextClipboardItem, ImageClipboardItem, ClipboardMetadata } from '@/types/clipboard'
 
+const imageBlobCache = new Map<string, { signature: string; blob: Blob }>()
+
 /**
  * 获取所有剪贴板项目，按 order 排序
  */
@@ -14,18 +16,19 @@ export async function getAllItems(): Promise<ClipboardItem[]> {
 /**
  * 添加文本项目
  */
-export async function addTextItem(content: string): Promise<TextClipboardItem> {
-  const items = await getAllItems()
-  const minOrder = getMinOrder(items)
-
+export async function addTextItem(
+  content: string,
+  preset?: Pick<TextClipboardItem, 'id' | 'createdAt' | 'updatedAt' | 'order' | 'pinned'>
+): Promise<TextClipboardItem> {
+  const now = Date.now()
   const itemToSave: TextClipboardItem = {
-    id: uuidv4(),
+    id: preset?.id ?? uuidv4(),
     type: 'text',
     content,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-    order: minOrder - 1,
-    pinned: false
+    createdAt: preset?.createdAt ?? now,
+    updatedAt: preset?.updatedAt ?? now,
+    order: typeof preset?.order === 'number' ? preset.order : await getNextTopOrder(),
+    pinned: preset?.pinned ?? false
   }
 
   await clipboardCollection.upsert(itemToSave)
@@ -36,10 +39,6 @@ export async function addTextItem(content: string): Promise<TextClipboardItem> {
  * 添加图片项目（将 Blob 转换为 base64）
  */
 export async function addImageItem(blob: Blob, mimeType: string): Promise<ImageClipboardItem> {
-  const items = await getAllItems()
-  const minOrder = getMinOrder(items)
-
-  // 将 Blob 转换为 base64
   const imageData = await blobToBase64(blob)
 
   const itemToSave: ImageClipboardItem = {
@@ -49,7 +48,7 @@ export async function addImageItem(blob: Blob, mimeType: string): Promise<ImageC
     mimeType,
     createdAt: Date.now(),
     updatedAt: Date.now(),
-    order: minOrder - 1,
+    order: await getNextTopOrder(),
     pinned: false
   }
 
@@ -65,22 +64,18 @@ export async function addImageItem(blob: Blob, mimeType: string): Promise<ImageC
  * 更新文本项目
  */
 export async function updateTextItem(id: string, content: string): Promise<void> {
-  // 查找现有项目
   const docs = await clipboardCollection.find({ id }).fetch()
   if (docs.length === 0) {
     throw new Error(`Item with id ${id} not found`)
   }
 
   const existingItem = docs[0] as any
-
-  // 创建更新后的项目
   const updatedItem = {
     ...existingItem,
     content,
     updatedAt: Date.now()
   }
 
-  // 使用 upsert 更新（传入 base 参数）
   await clipboardCollection.upsert(updatedItem, existingItem)
 }
 
@@ -96,7 +91,6 @@ export async function setPinStatus(id: string, pinned: boolean): Promise<void> {
 
   const allItems = await getAllItems()
   if (pinned) {
-    // 将置顶项放到置顶区域的最前
     const pinnedOrders = allItems
       .filter(item => item.pinned)
       .map(item => normalizeOrder(item.order))
@@ -104,7 +98,6 @@ export async function setPinStatus(id: string, pinned: boolean): Promise<void> {
     const minPinnedOrder = pinnedOrders.length > 0 ? Math.min(...pinnedOrders) : 0
     nextOrder = minPinnedOrder - 1
   } else {
-    // 取消置顶，放到非置顶的末尾
     const unpinnedOrders = allItems
       .filter(item => !item.pinned || item.id === id)
       .map(item => normalizeOrder(item.order))
@@ -127,7 +120,6 @@ export async function setPinStatus(id: string, pinned: boolean): Promise<void> {
  * 删除项目
  */
 export async function deleteItem(id: string): Promise<void> {
-  // 查找项目
   const docs = await clipboardCollection.find({ id }).fetch()
   if (docs.length === 0) {
     return
@@ -137,6 +129,7 @@ export async function deleteItem(id: string): Promise<void> {
   if (item._id) {
     await clipboardCollection.remove(String(item._id))
   }
+  imageBlobCache.delete(id)
 }
 
 /**
@@ -148,6 +141,7 @@ export async function clearAllItems(): Promise<number> {
   if (ids.length > 0) {
     await clipboardCollection.remove(ids)
   }
+  imageBlobCache.clear()
   return ids.length
 }
 
@@ -185,9 +179,6 @@ export async function updateItemsOrder(items: ClipboardItem[]): Promise<void> {
   }
 }
 
-/**
- * 工具函数：将 Blob 转换为 base64 data URL
- */
 function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -200,11 +191,7 @@ function blobToBase64(blob: Blob): Promise<string> {
   })
 }
 
-/**
- * 工具函数：将 base64 data URL 转换为 Blob
- */
 async function dataUrlToBlob(dataUrl: string, mimeType: string): Promise<Blob> {
-  // 优先使用 fetch 简化转换，确保 mimeType 正确
   const response = await fetch(dataUrl)
   const fetchedBlob = await response.blob()
   if (fetchedBlob.type === mimeType) {
@@ -213,13 +200,20 @@ async function dataUrlToBlob(dataUrl: string, mimeType: string): Promise<Blob> {
   return new Blob([await fetchedBlob.arrayBuffer()], { type: mimeType })
 }
 
-/**
- * 将数据库文档转换为运行时可用的 ClipboardItem
- */
 async function hydrateItem(doc: any): Promise<ClipboardItem> {
   if (doc.type === 'image') {
+    const signature = getImageSignature(doc)
+    const cached = imageBlobCache.get(String(doc.id))
+    if (cached && cached.signature === signature) {
+      return {
+        ...(doc as ImageClipboardItem),
+        blob: cached.blob
+      }
+    }
+
     try {
       const blob = await dataUrlToBlob(doc.imageData, doc.mimeType)
+      imageBlobCache.set(String(doc.id), { signature, blob })
       return {
         ...(doc as ImageClipboardItem),
         blob
@@ -233,6 +227,13 @@ async function hydrateItem(doc: any): Promise<ClipboardItem> {
   return doc as ClipboardItem
 }
 
+function getImageSignature(doc: { imageData?: string; mimeType?: string }) {
+  const imageData = doc.imageData ?? ''
+  const prefix = imageData.slice(0, 48)
+  const suffix = imageData.slice(-48)
+  return `${doc.mimeType ?? ''}:${imageData.length}:${prefix}:${suffix}`
+}
+
 function normalizeOrder(order: unknown): number {
   if (typeof order === 'number') return order
   const parsed = Number(order)
@@ -243,7 +244,6 @@ function compareDocs(a: any, b: any): number {
   const pinnedA = Boolean(a?.pinned)
   const pinnedB = Boolean(b?.pinned)
   if (pinnedA !== pinnedB) {
-    // 置顶的排在前面
     return pinnedA ? -1 : 1
   }
 
@@ -265,15 +265,15 @@ function normalizeTimestamp(value: unknown): number {
   return Number.isFinite(num) ? num : 0
 }
 
-function getMinOrder(items: ClipboardItem[]): number {
-  const finiteOrders = items
-    .map(i => normalizeOrder(i.order))
+async function getNextTopOrder(): Promise<number> {
+  const docs = await clipboardCollection.find({}, { sort: ['order'] }).fetch()
+  const finiteOrders = docs
+    .map((doc: any) => normalizeOrder(doc?.order))
     .filter(n => Number.isFinite(n) && n !== Number.MAX_SAFE_INTEGER)
 
-  // 如果现有数据没有合法的 order，使用 0 作为起点，保证新数据置顶
-  if (finiteOrders.length === 0) return 0
+  if (finiteOrders.length === 0) return -1
 
-  return Math.min(...finiteOrders)
+  return Math.min(...finiteOrders) - 1
 }
 
 /**
