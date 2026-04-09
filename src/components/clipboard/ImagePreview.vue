@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 const props = defineProps<{
   blob?: Blob
+  large?: boolean
 }>()
 
 const imageUrl = ref('')
@@ -37,7 +38,10 @@ onUnmounted(() => {
       v-if="imageUrl"
       :src="imageUrl"
       alt="Clipboard image"
-      class="max-w-full max-h-[250px] rounded-lg object-contain select-none"
+      :class="[
+        'max-w-full rounded-lg object-contain select-none',
+        props.large ? 'max-h-[calc(66.666vh-10rem)] md:max-h-full' : 'max-h-[250px]'
+      ]"
       draggable="false"
     />
   </div>

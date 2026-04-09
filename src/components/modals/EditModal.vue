@@ -16,12 +16,14 @@ const emit = defineEmits<{
 }>()
 
 const editContent = ref('')
+const isTextareaScrollbarVisible = ref(false)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const deleteButtonRef = ref<HTMLButtonElement | null>(null)
 const cancelButtonRef = ref<HTMLButtonElement | null>(null)
 const saveButtonRef = ref<HTMLButtonElement | null>(null)
 const imageDeleteButtonRef = ref<HTMLButtonElement | null>(null)
 const imageCancelButtonRef = ref<HTMLButtonElement | null>(null)
+let textareaScrollbarTimer: number | null = null
 
 watch(() => props.item, (newItem) => {
   if (newItem && isTextItem(newItem)) {
@@ -40,6 +42,8 @@ watch(() => props.visible, (newVal) => {
       }
       // For image modal, don't auto-focus on the image
     })
+  } else {
+    hideTextareaScrollbar()
   }
 })
 
@@ -58,6 +62,31 @@ function handleDelete() {
 
 function handleClose() {
   emit('close')
+}
+
+function clearTextareaScrollbarTimer() {
+  if (textareaScrollbarTimer !== null) {
+    clearTimeout(textareaScrollbarTimer)
+    textareaScrollbarTimer = null
+  }
+}
+
+function hideTextareaScrollbar() {
+  clearTextareaScrollbarTimer()
+  isTextareaScrollbarVisible.value = false
+}
+
+function showTextareaScrollbarTemporarily() {
+  isTextareaScrollbarVisible.value = true
+  clearTextareaScrollbarTimer()
+  textareaScrollbarTimer = window.setTimeout(() => {
+    isTextareaScrollbarVisible.value = false
+    textareaScrollbarTimer = null
+  }, 900)
+}
+
+function handleTextareaScroll() {
+  showTextareaScrollbarTemporarily()
 }
 
 function handleKeyDown(e: KeyboardEvent) {
@@ -112,6 +141,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  clearTextareaScrollbarTimer()
   window.removeEventListener('keydown', handleKeyDown)
 })
 </script>
@@ -130,9 +160,9 @@ onUnmounted(() => {
 
       <!-- Modal -->
       <Transition name="modal">
-        <div class="relative bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] w-full max-w-lg max-h-[80vh] overflow-hidden">
+        <div class="relative flex w-full max-w-lg max-h-[80vh] flex-col overflow-hidden rounded-[var(--radius-apple-lg)] bg-white shadow-[var(--shadow-apple-lg)] md:h-[66.666vh] md:max-h-[66.666vh] md:w-[66.666vw] md:max-w-[66.666vw]">
           <!-- Header -->
-          <div class="flex items-center justify-between p-4 border-b border-[var(--color-apple-gray-100)]">
+          <div class="shrink-0 flex items-center justify-between p-4 border-b border-[var(--color-apple-gray-100)]">
             <h3 class="text-lg font-semibold text-[var(--color-apple-gray-900)]">
               {{ isText ? '编辑内容' : '查看图片' }}
             </h3>
@@ -148,22 +178,32 @@ onUnmounted(() => {
           </div>
 
           <!-- Content -->
-          <div class="p-4 overflow-y-auto max-h-[50vh]">
+          <div
+            :class="[
+              'min-h-0 flex-1 overflow-hidden p-4',
+              isText ? 'md:p-0' : ''
+            ]"
+          >
             <textarea
               v-if="isText"
               ref="textareaRef"
               v-model="editContent"
-              class="w-full h-48 p-3 border border-[var(--color-apple-gray-100)] rounded-[var(--radius-apple)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-hermes-orange)] focus:border-transparent text-[var(--color-apple-gray-900)]"
+              :class="[
+                'edit-textarea w-full h-48 min-h-48 overflow-y-auto p-3 border border-[var(--color-apple-gray-100)] rounded-[var(--radius-apple)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-hermes-orange)] focus:border-transparent text-[var(--color-apple-gray-900)] md:h-full md:border-0 md:rounded-none md:p-4 md:focus:ring-0',
+                isTextareaScrollbarVisible ? 'scrollbar-active' : ''
+              ]"
+              @scroll="handleTextareaScroll"
             />
 
             <div
               v-else-if="isImage && isImageItem(item)"
               ref="imageRef"
-              class="rounded-[var(--radius-apple)]"
+              class="flex h-full items-center justify-center rounded-[var(--radius-apple)]"
             >
               <ImagePreview
                 v-if="item.blob"
                 :blob="item.blob"
+                large
               />
               <p v-else class="text-sm text-[var(--color-apple-gray-500)]">
                 图片数据加载中，请稍候再试
@@ -172,7 +212,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Footer for Text -->
-          <div v-if="isText" class="flex justify-between p-4 border-t border-[var(--color-apple-gray-100)]">
+          <div v-if="isText" class="shrink-0 flex justify-between p-4 border-t border-[var(--color-apple-gray-100)]">
             <button
               ref="deleteButtonRef"
               @click="handleDelete"
@@ -200,7 +240,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Footer for Image -->
-          <div v-else class="flex justify-end gap-2 p-4 border-t border-[var(--color-apple-gray-100)]">
+          <div v-else class="shrink-0 flex justify-end gap-2 p-4 border-t border-[var(--color-apple-gray-100)]">
             <button
               ref="imageCancelButtonRef"
               @click="handleClose"
@@ -231,5 +271,35 @@ onUnmounted(() => {
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
+}
+
+.edit-textarea {
+  scrollbar-width: none;
+}
+
+.edit-textarea::-webkit-scrollbar {
+  width: 0;
+}
+
+.edit-textarea.scrollbar-active {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-apple-gray-200) transparent;
+}
+
+.edit-textarea.scrollbar-active::-webkit-scrollbar {
+  width: 8px;
+}
+
+.edit-textarea.scrollbar-active::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.edit-textarea.scrollbar-active::-webkit-scrollbar-thumb {
+  background: var(--color-apple-gray-200);
+  border-radius: 4px;
+}
+
+.edit-textarea.scrollbar-active::-webkit-scrollbar-thumb:hover {
+  background: var(--color-apple-gray-500);
 }
 </style>
