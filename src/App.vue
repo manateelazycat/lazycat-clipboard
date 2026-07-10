@@ -9,12 +9,13 @@ import { useClipboard } from '@/composables/useClipboard'
 import type { ClipboardItem } from '@/types/clipboard'
 import { isTextItem } from '@/types/clipboard'
 
-const { updateText, deleteItem, loadItems, isLoading, syncLock, clearSelection } = useClipboardItems()
+const { updateText, deleteItem, clearAll, loadItems, isLoading, syncLock, clearSelection } = useClipboardItems()
 const { lastCopyMessage, copyEventId } = useClipboard()
 
 // Modal states
 const editModalVisible = ref(false)
 const deleteConfirmVisible = ref(false)
+const clearConfirmVisible = ref(false)
 const addModalVisible = ref(false)
 const currentEditItem = ref<ClipboardItem | null>(null)
 const currentDeleteItem = ref<ClipboardItem | null>(null)
@@ -25,7 +26,7 @@ const toastMessage = ref('')
 
 // Combined modal state for keyboard shortcuts
 const isModalOpen = computed(() =>
-  editModalVisible.value || deleteConfirmVisible.value || addModalVisible.value
+  editModalVisible.value || deleteConfirmVisible.value || clearConfirmVisible.value || addModalVisible.value
 )
 
 // Scroll to top function registration (for mobile)
@@ -71,6 +72,10 @@ function showDeleteConfirm(item: ClipboardItem) {
   deleteConfirmVisible.value = true
 }
 
+function showClearConfirm() {
+  clearConfirmVisible.value = true
+}
+
 function showAddModal() {
   clearSelection()
   addModalVisible.value = true
@@ -78,6 +83,7 @@ function showAddModal() {
 
 provide('showEditModal', showEditModal)
 provide('showDeleteConfirm', showDeleteConfirm)
+provide('showClearConfirm', showClearConfirm)
 provide('showAddModal', showAddModal)
 provide('isModalOpen', isModalOpen)
 provide('registerScrollToTop', registerScrollToTop)
@@ -120,6 +126,15 @@ function handleDeleteCancel() {
   currentDeleteItem.value = null
 }
 
+async function handleClearConfirm() {
+  await clearAll()
+  clearConfirmVisible.value = false
+}
+
+function handleClearCancel() {
+  clearConfirmVisible.value = false
+}
+
 // Handle add modal events
 function handleAddClose() {
   addModalVisible.value = false
@@ -153,6 +168,16 @@ watch(copyEventId, () => {
     :visible="deleteConfirmVisible"
     @confirm="handleDeleteConfirm"
     @cancel="handleDeleteCancel"
+  />
+
+  <DeleteConfirmDialog
+    :visible="clearConfirmVisible"
+    title="清空剪切板"
+    message="确定要清空所有剪切板内容吗？此操作无法撤销。"
+    confirm-label="清空"
+    show-cancel-button
+    @confirm="handleClearConfirm"
+    @cancel="handleClearCancel"
   />
 
   <AddItemModal

@@ -26,6 +26,7 @@ const { copyText, copyImage } = useClipboard()
 
 const showEditModal = inject<(item: ClipboardItem) => void>('showEditModal')
 const showDeleteConfirm = inject<(item: ClipboardItem) => void>('showDeleteConfirm')
+const showClearConfirm = inject<() => void>('showClearConfirm')
 const isModalOpen = inject<{ value: boolean }>('isModalOpen', { value: false })
 const focusInput = inject<() => void>('focusInput')
 
@@ -383,7 +384,7 @@ onUnmounted(() => {
       item-key="id"
       @start="handleDragStart"
       @end="handleDragEnd"
-      class="space-y-3 pb-24 md:pb-0"
+      class="space-y-3"
     >
       <template #item="{ element, index }">
         <ClipboardItemComponent
@@ -400,6 +401,16 @@ onUnmounted(() => {
         />
       </template>
     </draggable>
+
+    <div v-if="!isLoading && items.length > 0" class="flex justify-center pt-6 pb-24 md:pb-6">
+      <button
+        type="button"
+        class="text-sm text-[var(--color-apple-gray-500)] hover:text-[var(--color-apple-gray-900)] transition-colors"
+        @click.stop="showClearConfirm?.()"
+      >
+        清空剪切板
+      </button>
+    </div>
   </div>
 </template>
 

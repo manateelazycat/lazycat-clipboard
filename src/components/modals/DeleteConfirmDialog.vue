@@ -1,9 +1,18 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   visible: boolean
-}>()
+  title?: string
+  message?: string
+  confirmLabel?: string
+  showCancelButton?: boolean
+}>(), {
+  title: '确认删除',
+  message: '确定要删除这条内容吗？此操作无法撤销。',
+  confirmLabel: '删除',
+  showCancelButton: false
+})
 
 const emit = defineEmits<{
   confirm: []
@@ -57,7 +66,7 @@ onUnmounted(() => {
           <!-- Header -->
           <div class="flex items-center justify-between p-4">
             <h3 class="text-lg font-semibold text-[var(--color-apple-gray-900)]">
-              确认删除
+              {{ title }}
             </h3>
             <button
               @click="handleCancel"
@@ -72,21 +81,31 @@ onUnmounted(() => {
           <!-- Content -->
           <div class="px-4 pb-2">
             <p class="text-[var(--color-apple-gray-500)]">
-              确定要删除这条内容吗？此操作无法撤销。
+              {{ message }}
             </p>
           </div>
 
           <!-- Footer -->
-          <div class="flex justify-center p-4">
+          <div :class="['flex p-4', showCancelButton ? 'justify-end gap-2' : 'justify-center']">
+            <button
+              v-if="showCancelButton"
+              @click="handleCancel"
+              class="px-4 py-2.5 text-[var(--color-apple-gray-600)] rounded-[var(--radius-apple)] hover:bg-[var(--color-apple-gray-100)] transition-colors"
+            >
+              取消
+            </button>
             <button
               @click="handleConfirm"
-              class="w-full py-2.5 bg-red-600 text-white rounded-[var(--radius-apple)] font-medium hover:bg-red-700 transition-colors"
+              :class="[
+                showCancelButton ? 'px-4 py-2.5' : 'w-full py-2.5',
+                'bg-red-600 text-white rounded-[var(--radius-apple)] font-medium hover:bg-red-700 transition-colors'
+              ]"
             >
-              删除 (Enter)
+              {{ confirmLabel }}<template v-if="!showCancelButton"> (Enter)</template>
             </button>
           </div>
 
-          <p class="text-center text-sm text-[var(--color-apple-gray-500)] pb-4">
+          <p v-if="!showCancelButton" class="text-center text-sm text-[var(--color-apple-gray-500)] pb-4">
             按 ESC 取消
           </p>
         </div>
