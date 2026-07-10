@@ -96,7 +96,7 @@ export function getLightAppTopPadding() {
   const dynamicPaddingPx = LIGHT_APP_HEADER_COMPACT_PADDING_PX +
     (LIGHT_APP_HEADER_FULL_PADDING_PX - LIGHT_APP_HEADER_COMPACT_PADDING_PX) * lightAppHeaderRevealProgress.value
 
-  return `calc(env(safe-area-inset-top, 0px) + ${Math.round(dynamicPaddingPx * 100) / 100}px)`
+  return `${Math.round(dynamicPaddingPx * 100) / 100}px`
 }
 
 function upsertMeta(name: string, content: string) {

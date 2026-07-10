@@ -18,7 +18,7 @@ const headerStyle = computed<CSSProperties>(() => {
   const offsetY = -18 * (1 - progress)
 
   return {
-    paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)',
+    paddingTop: '12px',
     opacity: String(progress),
     transform: `translate3d(0, ${offsetY}px, 0)`,
     willChange: 'transform, opacity'
