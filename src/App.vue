@@ -192,7 +192,7 @@ watch(copyEventId, () => {
         v-if="showToast"
         class="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
       >
-        <div class="bg-[var(--color-apple-gray-900)]/90 text-white rounded-2xl shadow-lg px-8 py-6 flex flex-col items-center">
+        <div class="bg-[var(--color-inverse-surface)]/90 text-[var(--color-inverse-text)] rounded-2xl shadow-lg px-8 py-6 flex flex-col items-center">
           <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>

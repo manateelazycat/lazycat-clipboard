@@ -160,7 +160,7 @@ onUnmounted(() => {
 
       <!-- Modal -->
       <Transition name="modal">
-        <div class="relative flex w-full max-w-lg max-h-[80vh] flex-col overflow-hidden rounded-[var(--radius-apple-lg)] bg-white shadow-[var(--shadow-apple-lg)] md:h-[66.666vh] md:max-h-[66.666vh] md:w-[66.666vw] md:max-w-[66.666vw]">
+        <div class="relative flex w-full max-w-lg max-h-[80vh] flex-col overflow-hidden rounded-[var(--radius-apple-lg)] bg-[var(--color-surface)] shadow-[var(--shadow-apple-lg)] md:h-[66.666vh] md:max-h-[66.666vh] md:w-[66.666vw] md:max-w-[66.666vw]">
           <!-- Header -->
           <div class="shrink-0 flex items-center justify-between p-4 border-b border-[var(--color-apple-gray-100)]">
             <h3 class="text-lg font-semibold text-[var(--color-apple-gray-900)]">
@@ -216,7 +216,7 @@ onUnmounted(() => {
             <button
               ref="deleteButtonRef"
               @click="handleDelete"
-              class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-[var(--radius-apple)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-hermes-orange)]"
+              class="px-4 py-2 text-red-600 hover:bg-[var(--color-danger-soft)] rounded-[var(--radius-apple)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-hermes-orange)]"
             >
               删除
             </button>
@@ -251,7 +251,7 @@ onUnmounted(() => {
             <button
               ref="imageDeleteButtonRef"
               @click="handleDelete"
-              class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-[var(--radius-apple)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-hermes-orange)]"
+              class="px-4 py-2 text-red-600 hover:bg-[var(--color-danger-soft)] rounded-[var(--radius-apple)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-hermes-orange)]"
             >
               删除
             </button>

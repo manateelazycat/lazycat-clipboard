@@ -61,7 +61,7 @@ function handleDragHandleTouchStart() {
 <template>
   <div
     :class="[
-      'clipboard-item relative rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple)] p-4 cursor-pointer transition-all hover:shadow-[var(--shadow-apple-lg)] group overflow-hidden outline-none select-none border border-[var(--color-apple-gray-100)] bg-white',
+      'clipboard-item relative rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple)] p-4 cursor-pointer transition-all hover:shadow-[var(--shadow-apple-lg)] group overflow-hidden outline-none select-none border border-[var(--color-apple-gray-100)] bg-[var(--color-surface)]',
       multiSelectMode && isSelected ? 'selected-multi' : '',
       multiSelectMode && !isSelected ? 'unselected-multi' : ''
     ]"
@@ -139,11 +139,11 @@ function handleDragHandleTouchStart() {
 
     <div
       v-if="isSelected && !multiSelectMode"
-      class="absolute right-0 top-0 bottom-0 flex items-center gap-1 pr-4 pl-8 md:hidden bg-gradient-to-l from-white from-60% to-transparent"
+      class="absolute right-0 top-0 bottom-0 flex items-center gap-1 pr-4 pl-8 md:hidden bg-gradient-to-l from-[var(--color-surface)] from-60% to-transparent"
     >
       <button
         @click="handleCopyButton"
-        class="item-btn p-2.5 rounded-lg transition-colors bg-white"
+        class="item-btn p-2.5 rounded-lg transition-colors bg-[var(--color-surface)]"
         title="复制"
       >
         <svg class="w-5 h-5 text-[var(--color-apple-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,7 +153,7 @@ function handleDragHandleTouchStart() {
 
       <button
         @click="handleEdit"
-        class="item-btn p-2.5 rounded-lg transition-colors bg-white"
+        class="item-btn p-2.5 rounded-lg transition-colors bg-[var(--color-surface)]"
         title="编辑"
       >
         <svg class="w-5 h-5 text-[var(--color-apple-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

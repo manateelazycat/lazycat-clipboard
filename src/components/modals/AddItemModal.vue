@@ -99,7 +99,7 @@ onUnmounted(() => {
         />
 
         <!-- Modal -->
-        <div id="left-panel" class="relative bg-white rounded-t-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] w-full max-h-[80vh] overflow-hidden">
+        <div id="left-panel" class="relative bg-[var(--color-surface)] rounded-t-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] w-full max-h-[80vh] overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-[var(--color-apple-gray-100)]">
             <h3 class="text-lg font-semibold text-[var(--color-apple-gray-900)]">

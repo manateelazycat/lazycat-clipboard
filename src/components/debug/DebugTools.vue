@@ -62,7 +62,7 @@ function closeMeta() {
   <div class="fixed bottom-4 left-4 right-4 md:right-auto md:w-auto z-40 text-sm">
     <div class="relative inline-block max-w-full">
       <button
-        class="px-4 py-2 bg-[var(--color-apple-gray-900)] text-white rounded-full shadow-lg hover:shadow-[var(--shadow-apple-lg)] transition-all"
+        class="px-4 py-2 bg-[var(--color-inverse-surface)] text-[var(--color-inverse-text)] rounded-full shadow-lg hover:shadow-[var(--shadow-apple-lg)] transition-all"
         @click="panelOpen = !panelOpen"
       >
         调试工具
@@ -70,10 +70,10 @@ function closeMeta() {
 
       <div
         v-if="panelOpen"
-        class="absolute bottom-12 right-0 md:w-64 w-[min(92vw,360px)] max-w-full bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] border border-[var(--color-apple-gray-100)] p-3 space-y-2"
+        class="absolute bottom-12 right-0 md:w-64 w-[min(92vw,360px)] max-w-full bg-[var(--color-surface)] rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] border border-[var(--color-apple-gray-100)] p-3 space-y-2"
       >
         <button
-          class="w-full px-3 py-2 rounded-[var(--radius-apple)] bg-[var(--color-apple-gray-900)] text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+          class="w-full px-3 py-2 rounded-[var(--radius-apple)] bg-[var(--color-inverse-surface)] text-[var(--color-inverse-text)] hover:opacity-90 transition-opacity disabled:opacity-50"
           :disabled="isFetchingMeta"
           @click="handleShowMetadata"
         >
@@ -95,7 +95,7 @@ function closeMeta() {
       v-if="metaVisible"
       class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
     >
-      <div class="bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] w-full max-w-md p-6">
+      <div class="bg-[var(--color-surface)] rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] w-full max-w-md p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-[var(--color-apple-gray-900)]">MiniDB 元信息</h3>
           <button
@@ -144,7 +144,7 @@ function closeMeta() {
 
         <div class="mt-6 flex justify-end">
           <button
-            class="px-4 py-2 rounded-[var(--radius-apple)] bg-[var(--color-apple-gray-900)] text-white hover:opacity-90 transition-opacity"
+            class="px-4 py-2 rounded-[var(--radius-apple)] bg-[var(--color-inverse-surface)] text-[var(--color-inverse-text)] hover:opacity-90 transition-opacity"
             @click="closeMeta"
           >
             关闭

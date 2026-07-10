@@ -6,6 +6,9 @@
   --color-apple-gray-100: #e8e8ed;
   --color-apple-gray-200: #d2d2d7;
   --color-apple-gray-500: #86868b;
+  --color-apple-gray-600: #6e6e73;
+  --color-apple-gray-700: #515154;
+  --color-apple-gray-800: #333336;
   --color-apple-gray-900: #1d1d1f;
   --color-apple-blue: #0071e3;
   --color-hermes-orange: #f37021;
@@ -19,6 +22,37 @@
   --font-apple: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
 }
 
+:root {
+  color-scheme: light;
+  --color-surface: #ffffff;
+  --color-input: #ffffff;
+  --color-control-thumb: #ffffff;
+  --color-inverse-surface: #1d1d1f;
+  --color-inverse-text: #ffffff;
+  --color-danger-soft: #fff1f2;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-apple-gray-50: #171719;
+  --color-apple-gray-100: #2c2c2e;
+  --color-apple-gray-200: #3a3a3c;
+  --color-apple-gray-500: #98989d;
+  --color-apple-gray-600: #aeaeb2;
+  --color-apple-gray-700: #c7c7cc;
+  --color-apple-gray-800: #e5e5ea;
+  --color-apple-gray-900: #f5f5f7;
+  --color-hermes-orange: #ff8138;
+  --color-surface: #232325;
+  --color-input: #1c1c1e;
+  --color-control-thumb: #ffffff;
+  --color-inverse-surface: #f2f2f7;
+  --color-inverse-text: #1c1c1e;
+  --color-danger-soft: #3a2024;
+  --shadow-apple: 0 2px 8px rgba(0, 0, 0, 0.24);
+  --shadow-apple-lg: 0 8px 24px rgba(0, 0, 0, 0.34);
+}
+
 /* Base styles */
 body {
   font-family: var(--font-apple);
@@ -26,10 +60,16 @@ body {
   color: var(--color-apple-gray-900);
   margin: 0;
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #app {
   min-height: 100vh;
+}
+
+textarea,
+input[type='text'] {
+  background-color: var(--color-input);
 }
 
 /* Custom scrollbar for webkit browsers */

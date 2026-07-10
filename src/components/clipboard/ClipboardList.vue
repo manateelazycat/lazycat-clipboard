@@ -308,7 +308,7 @@ onUnmounted(() => {
           class="fixed inset-0 z-50 flex items-center justify-center px-4"
         >
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="cancelBulkDelete" />
-          <div class="relative bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] w-full max-w-sm overflow-hidden">
+          <div class="relative bg-[var(--color-surface)] rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] w-full max-w-sm overflow-hidden">
             <div class="p-4 border-b border-[var(--color-apple-gray-100)] flex items-center justify-between">
               <div class="text-base font-semibold text-[var(--color-apple-gray-900)]">批量删除</div>
               <button
@@ -347,7 +347,7 @@ onUnmounted(() => {
       class="flex items-center justify-between mb-2 md:mb-3 multi-select-bar"
       v-if="!isLoading && multiSelectMode"
     >
-      <div class="flex-1 flex items-center gap-2 bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple)] px-4 py-3 border border-[var(--color-apple-gray-100)]">
+      <div class="flex-1 flex items-center gap-2 bg-[var(--color-surface)] rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple)] px-4 py-3 border border-[var(--color-apple-gray-100)]">
         <div class="text-sm text-[var(--color-apple-gray-700)]">多选模式 · 已选择 {{ selectionIds.size }} 项</div>
         <div class="ml-auto flex items-center gap-2">
           <button

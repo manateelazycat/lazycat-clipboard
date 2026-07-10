@@ -62,7 +62,7 @@ onUnmounted(() => {
         />
 
         <!-- Dialog -->
-        <div class="relative bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] w-full max-w-sm overflow-hidden">
+        <div class="relative bg-[var(--color-surface)] rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple-lg)] w-full max-w-sm overflow-hidden">
           <!-- Header -->
           <div class="flex items-center justify-between p-4">
             <h3 class="text-lg font-semibold text-[var(--color-apple-gray-900)]">

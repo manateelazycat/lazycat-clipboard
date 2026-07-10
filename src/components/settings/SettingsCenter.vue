@@ -67,7 +67,7 @@ loadAppSettings()
 
 <style scoped>
 .settings-card {
-  background: white;
+  background: var(--color-surface);
   border-radius: var(--radius-apple-lg);
   box-shadow: var(--shadow-apple);
   padding: 20px;
@@ -149,7 +149,7 @@ loadAppSettings()
   width: 18px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background-color: var(--color-control-thumb);
   transition: 0.2s;
   border-radius: 50%;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
@@ -183,7 +183,7 @@ input:checked + .slider:before {
 }
 
 .segment-btn.active {
-  background: white;
+  background: var(--color-surface);
   color: var(--color-apple-gray-900);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }

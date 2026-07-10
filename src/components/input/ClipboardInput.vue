@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useClipboardItems } from '@/composables/useClipboardItems'
+import ThemeToggle from '@/components/theme/ThemeToggle.vue'
 
 const { addText, addImage } = useClipboardItems()
 const emit = defineEmits<{
@@ -115,15 +116,18 @@ onUnmounted(() => {
 <template>
   <div class="sticky">
     <div
-      class="bg-white rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple)] p-6"
+      class="bg-[var(--color-surface)] rounded-[var(--radius-apple-lg)] shadow-[var(--shadow-apple)] p-6"
       :class="{ 'ring-2 ring-[var(--color-apple-blue)]': isDragging }"
       @dragover="handleDragOver"
       @dragleave="handleDragLeave"
       @drop="handleDrop"
     >
-      <h2 class="text-lg font-semibold mb-4 text-[var(--color-apple-gray-900)]">
-        发送文字
-      </h2>
+      <div class="mb-4 flex min-h-9 items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold text-[var(--color-apple-gray-900)]">
+          发送文字
+        </h2>
+        <ThemeToggle compact />
+      </div>
 
       <div class="relative">
         <textarea
@@ -137,10 +141,10 @@ onUnmounted(() => {
         <Transition name="tooltip">
           <div
             v-if="showEmptyTooltip"
-            class="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-[var(--color-apple-gray-900)] text-white text-xs rounded-[var(--radius-apple)] whitespace-nowrap"
+            class="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-[var(--color-inverse-surface)] text-[var(--color-inverse-text)] text-xs rounded-[var(--radius-apple)] whitespace-nowrap"
           >
             发送的内容不能为空
-            <div class="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 bg-[var(--color-apple-gray-900)] rotate-45"></div>
+            <div class="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 bg-[var(--color-inverse-surface)] rotate-45"></div>
           </div>
         </Transition>
       </div>
